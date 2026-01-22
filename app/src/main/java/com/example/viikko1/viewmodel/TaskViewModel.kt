@@ -20,6 +20,20 @@ class TaskViewModel : ViewModel() {
     }
 
     fun toggleDone(id: Int) {
-        tasks = tasks.map { if (it.id == id) it.copy(done = !it.done) else it }
+        tasks = tasks.map { if (it.id == id) it.copy(done = !it.done)
+        else it
+        }
+    }
+
+    fun filterByDone(done: Boolean) {
+        tasks = tasks.filter { it.done == done }
+    }
+
+    fun sortByDueDate() {
+        tasks = tasks.sortedBy { it.dueDate }
+    }
+
+    fun removeTask(id: Int) {
+        tasks = tasks.filter { it.id != id }
     }
 }

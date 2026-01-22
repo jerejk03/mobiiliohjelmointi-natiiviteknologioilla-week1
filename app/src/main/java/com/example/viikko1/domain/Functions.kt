@@ -21,3 +21,7 @@ fun toggleDone(list: List<Task>, id: Int): List<Task> {
 fun filterByDone(list: List<Task>, done: Boolean): List<Task> {
     return list.filter { it.done == done }
 }
+
+fun removeTask(list: List<Task>, id: Int): List<Task> {
+    return list.filter { it.id != id }
+}
