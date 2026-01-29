@@ -6,34 +6,60 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.viikko1.domain.Task
 import com.example.viikko1.domain.mockTasks
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class TaskViewModel : ViewModel() {
-    var tasks by mutableStateOf(listOf<Task>())
-        private set
+
+    private val _tasks = MutableStateFlow<List<Task>>(emptyList())
+    val tasks: StateFlow<List<Task>> = _tasks
+
+    private val _selectedTask = MutableStateFlow<Task?>(null)
+    val selectedTask: StateFlow<Task?> = _selectedTask
 
     init {
-        tasks = mockTasks
+        _tasks.value = mockTasks
     }
 
     fun addTask(task: Task) {
-        tasks = tasks + task
+        _tasks.value += task
     }
 
     fun toggleDone(id: Int) {
-        tasks = tasks.map { if (it.id == id) it.copy(done = !it.done)
+        _tasks.value = _tasks.value.map { if (it.id == id) it.copy(done = !it.done)
         else it
         }
     }
 
     fun filterByDone(done: Boolean) {
-        tasks = tasks.filter { it.done == done }
+        _tasks.value = _tasks.value.filter { it.done == done }
     }
 
     fun sortByDueDate() {
-        tasks = tasks.sortedBy { it.dueDate }
+        _tasks.value = _tasks.value.sortedBy { it.dueDate }
     }
 
     fun removeTask(id: Int) {
-        tasks = tasks.filter { it.id != id }
+        _tasks.value = _tasks.value.filter { it.id != id }
+    }
+
+    fun closeDialog() {
+        _selectedTask.value = null
+    }
+
+    fun selectTask(task: Task) {
+        _selectedTask.value = task
+
+    }
+
+    fun updateTask(updated: Task) {
+        _tasks.value = _tasks.value.map {
+            if (it.id == updated.id) {
+                updated
+            } else {
+                it
+            }
+        }
+        _selectedTask.value = null
     }
 }

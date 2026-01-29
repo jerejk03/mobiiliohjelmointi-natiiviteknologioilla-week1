@@ -1,5 +1,6 @@
 package com.example.viikko1.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,10 +32,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.viikko1.viewmodel.TaskViewModel
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.runtime.collectAsState
 
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewModel()) {
+    val tasks by viewModel.tasks.collectAsState()
+    val selectedTask by viewModel.selectedTask.collectAsState()
+
     var name by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var selectedPriority by remember { mutableIntStateOf(1) }
@@ -76,30 +82,34 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewMod
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(viewModel.tasks) { task ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Checkbox(
-                        checked = task.done,
-                        onCheckedChange = {
-                            viewModel.toggleDone(task.id)
-                        }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "${task.id}. ${task.title} - ${task.description} " +
-                                "- priority: ${task.priority} - ${task.dueDate}",
-                        fontSize = 14.sp,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Button(
-                        onClick = {
-                            viewModel.removeTask(task.id)
-                        }
+            items(tasks) { task ->
+                Card(modifier = Modifier
+                    .padding(8.dp)
+                    .clickable { viewModel.selectTask(task) }) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text("Delete")
+                        Checkbox(
+                            checked = task.done,
+                            onCheckedChange = {
+                                viewModel.toggleDone(task.id)
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "${task.id}. ${task.title} - ${task.description} " +
+                                    "- priority: ${task.priority} - ${task.dueDate}",
+                            fontSize = 14.sp,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Button(
+                            onClick = {
+                                viewModel.removeTask(task.id)
+                            }
+                        ) {
+                            Text("Delete")
+                        }
                     }
                 }
             }
@@ -157,7 +167,7 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewMod
             Button(
                 onClick = {
                     val newTask = Task(
-                        id = viewModel.tasks.size + 1,
+                        id = tasks.size + 1,
                         title = name,
                         description = description,
                         priority = selectedPriority,
@@ -173,7 +183,15 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewMod
             )
         }
     }
+    if (selectedTask != null) {
+        DetailDialog(
+            task = selectedTask!!,
+            onClose = { viewModel.closeDialog() },
+            onUpdate = { viewModel.updateTask(it) }
+        )
+    }
 }
+
 
 @Preview(showBackground = true)
 @Composable

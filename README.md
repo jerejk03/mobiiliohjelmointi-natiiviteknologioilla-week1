@@ -65,6 +65,8 @@ mockTasks
 
 - Testidataa sovelluksen alkuun.
 
+## Viikko 2
+
 ### Compose-tilanhallinta
 
 Compose-tilanhhallinta toimii niin, että kun jokin tila (State) muuttuu, niin kaikki sovelluksen
@@ -77,6 +79,19 @@ ViewModel on parempi kuin remember, koska remember tallentaa tilan vain yksittä
 funktion läpikäynnin ajaksi, ja tila resetoi kun composable-funktio runnataan uudestaan, esimerkiksi
 näyttöä kääntäessä. ViewModel taas säilyttää tilan muutosten, esimerkiksi näytön kääntämisen yli.
 Se myös mahdollistaa tilan jakamisen useiden Composable-funktioiden välillä.
+
+## Viikko 3
+
+Selitä MVVM, miksi se on hyödyllinen Compose-sovelluksissa.
+
+- MVVM jaottelee koodin niin, että näkymän, logiikan ja datan koodit ovat erillään
+- MVVM on hyödyllinen Compose-sovelluksissa, koska se tekee koodista selkeää ja tekee UI:sta
+automaattisesti muutoksiin reagoivan.
+
+Kerro miten StateFlow toimii.
+
+- StateFlow pitää viimeismmän arvon muistissa ja päivittää näkymän automaattisesti kun se havaitsee
+muutoksen
 
 ## Käyttöliittymä
 
