@@ -93,6 +93,34 @@ Kerro miten StateFlow toimii.
 - StateFlow pitää viimeismmän arvon muistissa ja päivittää näkymän automaattisesti kun se havaitsee
 muutoksen
 
+## Viikko 4
+
+Mitä tarkoittaa navigointi Jetpack Composessa
+
+- Navigointi tarkoittaa näkymien (Composablejen) välistä siirtymistä sovelluksessa ilman erillisiä Activityjä.
+
+Mitä ovat NavHost ja NavController
+- NavController hallitsee navigointia. NavHost määrittelee, mitä Composableja eri reitit näyttävät.
+
+Miten sovelluksesi navigaatiorakenne on toteutettu (Home ↔ Calendar)
+- Home- ja Calendar-ruudut ovat omia reittejään NavHostissa. Siirtyminen tapahtuu NavController.navigate()-kutsulla yläpalkin ikonista.
+
+Miten MVVM ja navigointi yhdistyvät (yksi ViewModel kahdelle screenille)
+- Yksi TaskViewModel luodaan MainActivityssä ja välitetään molemmille ruuduille. 
+Navigointi ei luo uusia ViewModel-instansseja, vaan näkymät jakavat saman datan.
+
+Miten ViewModelin tila jaetaan kummankin ruudun välillä
+- Tehtävälista on StateFlow ViewModelissa ja kerätään molemmissa ruuduissa collectAsState()-kutsulla. 
+Kun tila muuttuu, molemmat näkymät päivittyvät automaattisesti.
+
+Miten CalendarScreen on toteutettu
+- CalendarScreen käyttää samaa tehtävälistaa kuin HomeScreen ja esittää tehtävät päivämäärän perusteella ryhmiteltynä. 
+Näkymä on kalenterimainen listaus.
+
+Miten AlertDialog hoitaa addTask ja editTask
+- AlertDialog kerää käyttäjän syötteet ja kutsuu callbackia, joka päivittää ViewModelin tilan. 
+Samaa rakennetta voidaan käyttää sekä uuden tehtävän lisäämiseen että olemassa olevan muokkaamiseen.
+
 ## Käyttöliittymä
 
 Tehtävälista toteutettu LazyColumnilla
