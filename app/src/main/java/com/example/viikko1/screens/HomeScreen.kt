@@ -32,20 +32,29 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.viikko1.viewmodel.TaskViewModel
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.collectAsState
+import androidx.compose.material.icons.filled.CalendarMonth
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewModel()) {
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: TaskViewModel = viewModel(),
+    onTaskClick: (Int) -> Unit = {},
+    onAddClick: () -> Unit = {},
+    onNavigateCalendar: () -> Unit = {},
+    onNavigateSettings: () -> Unit = {}
+) {
     val tasks by viewModel.tasks.collectAsState()
     val selectedTask by viewModel.selectedTask.collectAsState()
-
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var selectedPriority by remember { mutableIntStateOf(1) }
-    var date by remember { mutableStateOf("") }
-    var done by remember { mutableStateOf(false) }
+    val addTaskFlag by viewModel.addTaskDialogVisible.collectAsState()
 
     Column(
         modifier = modifier
@@ -53,13 +62,26 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewMod
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
-        Text("Task list", fontSize = 24.sp)
-
+        TopAppBar(
+            title = { Text("Task List") },
+            actions = {
+                IconButton(onClick = onNavigateCalendar) {
+                     Icon(Icons.Default.CalendarMonth, contentDescription = "Calendar")
+                 }
+                IconButton(onClick = onNavigateSettings) {
+                    Icon(Icons.Default.Settings, contentDescription = "Settings")
+                }
+            }
+        )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Button(
+                onClick = onAddClick
+            ) {
+                Text("+")
+                }
 
             Button(
                 onClick = {
@@ -85,7 +107,7 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewMod
             items(tasks) { task ->
                 Card(modifier = Modifier
                     .padding(8.dp)
-                    .clickable { viewModel.selectTask(task) }) {
+                    .clickable { onTaskClick(task.id) }) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -114,74 +136,6 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewMod
                 }
             }
         }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-        ) {
-
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("Task name") },
-                modifier = Modifier.fillMaxWidth(),
-                maxLines = 1
-            )
-
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth(),
-                maxLines = 2
-            )
-
-            OutlinedTextField(
-                value = date,
-                onValueChange = { date = it },
-                label = { Text("Date (YYYY-MM-DD)") },
-                modifier = Modifier.fillMaxWidth(),
-                maxLines = 1
-            )
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-
-                Button(
-                    onClick = {
-                        if (selectedPriority < 3) {
-                            selectedPriority += 1
-                        } else {
-                            selectedPriority = 1
-                        }
-                    }
-                ) {
-                    val buttonText = when (selectedPriority) {
-                        1 -> "Priority : low"
-                        2 -> "Priority: medium"
-                        else -> "Priority: high"
-                    }
-                    Text(buttonText)
-                }
-            }
-
-            Button(
-                onClick = {
-                    val newTask = Task(
-                        id = tasks.size + 1,
-                        title = name,
-                        description = description,
-                        priority = selectedPriority,
-                        dueDate = date,
-                        done = done
-                    )
-                    viewModel.addTask(newTask)
-
-                },
-                content = {
-                    Text("Add task")
-                }
-            )
-        }
     }
     if (selectedTask != null) {
         DetailDialog(
@@ -190,13 +144,10 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: TaskViewModel = viewMod
             onUpdate = { viewModel.updateTask(it) }
         )
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun TaskListPreview() {
-    Viikko1Theme {
-        HomeScreen()
+    if (addTaskFlag) {
+        AddDialog(
+            onClose = { viewModel.addTaskDialogVisible.value = false },
+            onUpdate = { viewModel.addTask(it) }
+        )
     }
 }

@@ -17,12 +17,16 @@ class TaskViewModel : ViewModel() {
     private val _selectedTask = MutableStateFlow<Task?>(null)
     val selectedTask: StateFlow<Task?> = _selectedTask
 
+    val addTaskDialogVisible = MutableStateFlow<Boolean>(false)
+
+
     init {
         _tasks.value = mockTasks
     }
 
     fun addTask(task: Task) {
         _tasks.value += task
+        addTaskDialogVisible.value = false
     }
 
     fun toggleDone(id: Int) {
@@ -62,4 +66,10 @@ class TaskViewModel : ViewModel() {
         }
         _selectedTask.value = null
     }
+
+    fun openTask(id: Int) {
+        val task = _tasks.value.find { it.id == id }
+        _selectedTask.value = task
+    }
 }
+
